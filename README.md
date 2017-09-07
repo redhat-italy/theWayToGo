@@ -1,0 +1,2 @@
+# theWayToGo
+Note su Golang
