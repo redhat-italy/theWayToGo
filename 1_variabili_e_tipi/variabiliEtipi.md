@@ -103,6 +103,20 @@ e cerchiamo nel disassemblato il main, troviamo questo:
 ```
 Qui si vede che le variabili foo e p sono messe sullo stack ed inizializzate a zero (le istruzioni movq).
 
+### Perché var é l’unico modo per garantire, per tutti i tipi, che una variabile sia inizializzata al suo zero-value?
+Puo' inizialmente sembrare che anche utilizzando := si riesce ad inizizalizzare una variabile al suo zero value, ad esempio:
+```go
+var int i1
+int i2 := 0
+```
+questo non e' pero' vero per **tutti** i tipi, infatti per le slice abbiamo:
+```go
+var name1 []string
+name2 := []string{}
+```
+name1 e' un nil slice (zero value) mentre name2 e' un empty slice (usando empty literal)
+La slice necessita di questa differenza semantica per la necessita' di mostrare un risultato vuoto. Un esempio per convincersi e' https://play.golang.org/p/_5FytATl3R .
+
 ### Uso di new
 Sostanzialmente `new` non ha senso di venir usato, come si legge anche su [GoPL]:
 > *"The new function is relatively rarely used because the most common unnamed variables are of struct types, for which the struct literal syntax (§4.4.1) is more flexible."*
@@ -110,6 +124,4 @@ Sostanzialmente `new` non ha senso di venir usato, come si legge anche su [GoPL]
 Rob Pike nel 2010 aveva capito che new non seriva a niente e voleva estendere make per fare quello che oggi fa new. Così da poter utilizzare new per far qualcosa di simile a quello che fanno gli altri linguaggi, siveda [questa discussione](https://groups.google.com/forum/#!topic/golang-nuts/kWXYU95XN04/discussion[1-25]).
 
 ### Size dei tipi
-la regola dice che size del puntatore = size del word = size dell'int
-un int é sempre una word
-quindi sul laptop int = int64, sul playground che é amd64p32 é int32
+* Puntatori: la regola dice che size del puntatore = size del word = size dell'int un int é sempre una word quindi sul laptop int = int64, sul playground che é amd64p32 (architettura 64bit con puntatori a 32 bit) é int32. Ad esempio eseguendo https://play.golang.org/p/AbwhjlPhm8 online sono 4 byte per un int se lo si esegue sul laptop sono 8.
