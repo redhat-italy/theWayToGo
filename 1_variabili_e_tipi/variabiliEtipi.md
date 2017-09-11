@@ -132,13 +132,13 @@ type struct P {
    x, y int
 }
 ```
-and
+e
 ```go
 type struct Q {
    a, b int
 }
 ```
-non sono compatibilie quindi:
+non sono compatibili e quindi:
 ```go
 var p P
 var q Q
@@ -148,7 +148,7 @@ non compila.
 * La specifica e' https://golang.org/ref/spec#Conversions .
 * La conversione e' sempre una copia.
 * La conversione deve essere specifica, non esistono cast in Go.
-* Usando `unsafe`(per qualche info in piu' su unsafe http://www.tapirgames.com/blog/golang-unsafe) si puo' convertire senza quese costrizioni; potenzialmente riuscendo a fare cose tipo: https://play.golang.org/p/3lQZGjGy4V
+* Usando `unsafe`(per qualche info in piu' su unsafe http://www.tapirgames.com/blog/golang-unsafe) si puo' convertire senza quese costrizioni; potenzialmente riuscendo a fare cose tipo: https://play.golang.org/p/3lQZGjGy4V . Una spiegazione di come gli `unsafe.Pointer` sono trattati dal GC si puo' trovare qui': https://groups.google.com/forum/m/#!topic/golang-nuts/yNis7bQG_rY.
 
 ### Tipi
 * un tipo identifica due cose, la lunghezza in memoria
