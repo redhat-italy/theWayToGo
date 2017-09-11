@@ -95,11 +95,11 @@ e cerchiamo nel disassemblato il main, troviamo questo:
     var foo int
       401e10: 48 c7 45 c8 00 00 00 movq   $0x0,-0x38(%rbp)
       401e17: 00
-    var p P
+    var p Phttps://www.youtube.com/watch?v=WzRrzpuprYY
       401e18: 48 c7 85 e0 fe ff ff     movq   $0x0,-0x120(%rbp)
       401e1f: 00 00 00 00
       401e23: 48 c7 85 e8 fe ff ff     movq   $0x0,-0x118(%rbp)
-      401e2a: 00 00 00 00
+      401e2a: 00 00 00 00https://www.youtube.com/watch?v=WzRrzpuprYY
 ```
 Qui si vede che le variabili foo e p sono messe sullo stack ed inizializzate a zero (le istruzioni movq).
 
@@ -123,5 +123,37 @@ Sostanzialmente `new` non ha senso di venir usato, come si legge anche su [GoPL]
 
 Rob Pike nel 2010 aveva capito che new non seriva a niente e voleva estendere make per fare quello che oggi fa new. Così da poter utilizzare new per far qualcosa di simile a quello che fanno gli altri linguaggi, siveda [questa discussione](https://groups.google.com/forum/#!topic/golang-nuts/kWXYU95XN04/discussion[1-25]).
 
-### Size dei tipi
+### Conversioni
+* la conversione tra tipi viene compilata se accettabile, altrimento no
+* può avverine solo tra tipi compatibili. ad esempio float -> int per tipi semplici.
+* per tipi strutturati devono essere identici, ed ad esempio non si può convertire una struct in un altra, anche se i membri sono dello stesso tipo. Ad esempio:
+```go
+type struct P {
+   x, y int
+}
+```
+and
+```go
+type struct Q {
+   a, b int
+}
+```
+non sono compatibilie quindi:
+```go
+var p P
+var q Q
+q = Q(p)
+```
+non compila.
+* La specifica e' https://golang.org/ref/spec#Conversions .
+* La conversione e' sempre una copia.
+* La conversione deve essere specifica, non esistono cast in Go.
+* Usando `unsafe`(per qualche info in piu' su unsafe http://www.tapirgames.com/blog/golang-unsafe) si puo' convertire senza quese costrizioni; potenzialmente riuscendo a fare cose tipo: https://play.golang.org/p/3lQZGjGy4V
+
+### Tipi
+* un tipo identifica due cose, la lunghezza in memoria
+e come sono organizzati i byte al suo interno, ossia come si leggono.
+* int, ne esistono a 8 (int8), 16 (int16), 32 (int32) e 64 (int64) bit signed e unsigned rappresentati in complemento a due.
+* float64 ad esempio vuol dire 8 byte organizzati (e quindi da interpretarsi come numero) secondo specifica IEEE 754.
+* il tipo int (senza esplicitamente specificafre il size) apparentemente nasconde le dimensioni, ma abbiamo visto che non é cosí (int ha la size del puntatore dell'architettura per cui compili).
 * Puntatori: la regola dice che size del puntatore = size del word = size dell'int un int é sempre una word quindi sul laptop int = int64, sul playground che é amd64p32 (architettura 64bit con puntatori a 32 bit) é int32. Ad esempio eseguendo https://play.golang.org/p/AbwhjlPhm8 online sono 4 byte per un int se lo si esegue sul laptop sono 8.
