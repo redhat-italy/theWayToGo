@@ -33,12 +33,20 @@
 
 ### Stack vs Heap
 Lo stack in go, e stack vs heap. 
-In go c'è uno stack per goroutine, anziché uno stack per processo. Fino a, credo, la versione 1.2 di go, lo stack era gestito in maniera segmentata (split stacks): in pratica una lista doppiamente collegata di stack segment. Si partiva da un segmento, se la goroutine necessitava di più stack si allocava un nuovo segmento, quando la goroutine non necessitava più di una certa parte dello stack lo stack veniva ristretto. Il segmento iniziale (e quello di crescita) era di 8kb credo nella 1.2
+In go c'è uno stack per goroutine (c'é sempre una goroutine, quella del main se non ce ne sono atre esplicite), anziché uno stack per processo. 
+Fino a, credo, la versione 1.2 di go, lo stack era gestito in maniera segmentata (split stacks): in pratica una lista doppiamente collegata di stack segment. 
+Si partiva da un segmento, se la goroutine necessitava di più stack si allocava un nuovo segmento, quando la goroutine non necessitava più di una certa parte dello stack lo stack veniva ristretto. 
+Il segmento iniziale (e quello di crescita) era di 8kb credo nella 1.2
 
 Il problema che fu riscontrato è l'overhead del processo di allocazione e rilascio ("hot splits")
 
 Dalla 1.3 go implementa il contiguous stack. In pratica, per ogni goroutine viene allocato uno stack iniziale di 2kb. 
-Se la goroutine necessita di più stack, viene allocato un nuovo stack ed il vecchio viene copiato sul nuovo. Lo stack è sempre contiguo e non in segmenti. Per rendere il processo più agile ed efficiente, il nuovo stack viene allocato in potenze di 2. In pratica, si parte da 2kb, poi vengono allocati 4kb, poi 8kb etc.
+Se la goroutine necessita di più stack, viene allocato un nuovo stack ed il vecchio viene copiato sul nuovo. 
+Lo stack è sempre contiguo e non in segmenti. Per rendere il processo più agile ed efficiente, il nuovo stack viene allocato in potenze di 2. 
+In pratica, si parte da 2kb, poi vengono allocati 4kb, poi 8kb etc.
+
+Ad ogni funzione viene assegnato un pezzo dello stack (stack frame), che ha una dimensione nota a compile time (potenzialmente diverso per ogni stack frame). 
+In questo modo go sa cosa puó gestire sullo stack e cosa no per ogni funzione
 
 Se date una occhiata a https://golang.org/src/runtime/stack.go si trova il seguente codice:
 
@@ -117,3 +125,12 @@ func func2() (*PS) {
 ```
 
 Come si vede, entrambe le funzioni ritornano un puntatore ad un oggetto sull'heap, come testimoniano le chiamate a `__go_new`. Questo perché il compilatore ha effettato una escape analysis e ha capito che le variabili locali devono sopravvivere anche all'uscita della funzione e devono quindi vivere sull'heap.
+
+## Puntatori
+
+In go esiste solo il pass by value: si copia il valore func(value) oppure il puntatore ad un valore func(&value) esattamente come in Java
+
+Usare i puntatori serve solo per fare sharing di valori fra i program boundaries invece che copiarli:
+function calls
+goroutines
+
