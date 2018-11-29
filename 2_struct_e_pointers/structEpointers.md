@@ -48,6 +48,35 @@ In pratica, si parte da 2kb, poi vengono allocati 4kb, poi 8kb etc.
 Ad ogni funzione viene assegnato un pezzo dello stack (stack frame), che ha una dimensione nota a compile time (potenzialmente diverso per ogni stack frame). 
 In questo modo go sa cosa puó gestire sullo stack e cosa no per ogni funzione
 
+Eseguendo questo programmino si puó vedere come, all'aumentare del const size, go sia costretto ogni tanto a riallocare tutto lo stack facendolo crescere.
+(si nota dal cambio di indirizzo della string "ugol")
+
+```go
+package main
+
+const size = 5
+
+func main() {
+
+	s := "ugol"
+	stackCopy(&s, 0, [size]int{})
+}
+
+func stackCopy(s *string, c int, a [size]int) {
+	println(c, s, *s)
+	//println(c, s, *s, &a)
+
+	c++
+
+	if c == 10 {
+		return
+	}
+
+	stackCopy(s, c, a)
+}
+
+```
+
 Se date una occhiata a https://golang.org/src/runtime/stack.go si trova il seguente codice:
 
 ```go
