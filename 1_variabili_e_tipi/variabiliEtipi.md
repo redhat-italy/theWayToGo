@@ -115,6 +115,10 @@ var name1 []string
 name2 := []string{}
 ```
 name1 e' un nil slice (zero value) mentre name2 e' un empty slice (usando empty literal)
+
+name1 é dunque una struttura con tutti zero value, quindi ha il puntatore a nil, capacity e length a 0. Serializzando, stamperá nil
+name2 invece ha il puntatore ad {empty struct} (ha uno specifico address che cambia da runtime a runtime), capacity e length a 0. Serializzando, stamperá []
+
 La slice necessita di questa differenza semantica per la necessita' di mostrare un risultato vuoto. Un esempio per convincersi e' https://play.golang.org/p/_5FytATl3R .
 
 ### Uso di new
