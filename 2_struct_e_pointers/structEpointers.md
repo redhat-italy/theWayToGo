@@ -162,4 +162,3 @@ In go esiste solo il pass by value: si copia il valore func(value) oppure il pun
 Usare i puntatori serve solo per fare sharing di valori fra i program boundaries invece che copiarli:
 function calls
 goroutines
-
